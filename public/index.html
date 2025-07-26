@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Technology CC.s - View Ip</title>
+	<!-- FontAwesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- Estilos propios -->
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<main class="main">
+		<div class="int_main">
+			<div class="header_main">
+				<span class="title span_main"><i class="fa fa-microchip"></i> Technology CC.s</span> - 
+				<span class="subtitle spna_main">View your IP is easy.</span>
+			</div>
+			<div class="body_main">
+				<div class="int_body_main">
+					<h3 class="title_body">View ( IP )</h3>
+					<p class="text_body">Click on the button to view the secure IP of your local location.</p>
+					<div class="box_sends">
+						<span class="text_ip">IP: <span id="ip_text">---</span></span>
+					</div>
+					<div class="group_buttons_main">
+						<button type="button" id="secure_ip" class="secureip btn_main">Secure IP</button>
+						<button type="button" class="viewperson btn_main">View person's IP</button>
+					</div>
+				</div>
+			</div>
+			<div class="footer_main">
+				© Copyright by Technology Cc.s
+			</div>
+		</div>
+	</main>
+
+	<script>
+		// Protección contra consola
+		setInterval(() => {
+			if (window.console && (console.firebug || console.table)) {
+				alert('⚠️ Acceso denegado. La consola está deshabilitada por seguridad.');
+				location.reload();
+			}
+		}, 2000);
+
+		// Protección contra modificaciones al DOM
+		const originalHTML = document.documentElement.innerHTML;
+		setInterval(() => {
+			if (document.documentElement.innerHTML !== originalHTML) {
+				alert('⚠️ Modificación detectada. Esta acción ha sido reportada.');
+				location.reload();
+			}
+		}, 3000);
+
+		// Acción al hacer click en "Secure IP"
+		document.getElementById('secure_ip').addEventListener('click', async () => {
+			try {
+				const res = await fetch('https://api.ipify.org?format=json');
+				const data = await res.json();
+				const ip = data.ip;
+
+				// Mostrar IP en el span
+				document.getElementById('ip_text').textContent = ip;
+
+				// Mostrar con SweetAlert2
+				Swal.fire({
+					icon: 'info',
+					title: 'Tu IP pública',
+					text: `IP: ${ip}`,
+					confirmButtonText: 'Cerrar'
+				});
+
+				// Enviar IP al servidor
+				await fetch('/log', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						event: 'aplastó en el botón',
+						ip: ip
+					})
+				});
+			} catch (err) {
+				console.error('Error al obtener la IP:', err);
+				Swal.fire({
+					icon: 'error',
+					title: 'Error',
+					text: 'No se pudo obtener tu IP'
+				});
+			}
+		});
+	</script>
+</body>
+</html>
